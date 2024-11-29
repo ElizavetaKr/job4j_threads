@@ -16,20 +16,25 @@ public class Wget implements Runnable {
     @Override
     public void run() {
         File file = new File("tmp.xml");
-        long startAt = 0;
-        long finishAt = 0;
         try (InputStream input = new URL(url).openStream();
              OutputStream output = new FileOutputStream(file)) {
             byte[] dataBuffer = new byte[1024];
             int bytesRead;
+            int byteSum = 0;
+            long pause = 0;
+            long startAt = System.nanoTime();
             while ((bytesRead = input.read(dataBuffer, 0, dataBuffer.length)) != -1) {
-                startAt = System.nanoTime();
                 output.write(dataBuffer, 0, bytesRead);
-                finishAt = System.nanoTime();
+                byteSum += bytesRead;
+                Thread.sleep(pause);
+
+                long downloadTime = System.nanoTime() - startAt;
+                if (byteSum >= speed) {
+                    pause = byteSum * 1_000_000L / (downloadTime * speed);
+                    byteSum = 0;
+                }
             }
-            long downloadTime = finishAt - startAt;
-            long pause = downloadTime / speed;
-            Thread.sleep(pause);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
