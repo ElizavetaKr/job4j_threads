@@ -21,17 +21,17 @@ public class Wget implements Runnable {
             byte[] dataBuffer = new byte[1024];
             int bytesRead;
             int byteSum = 0;
-            long pause = 0;
-            long startAt = System.nanoTime();
+            long startAt = System.currentTimeMillis();
             while ((bytesRead = input.read(dataBuffer, 0, dataBuffer.length)) != -1) {
                 output.write(dataBuffer, 0, bytesRead);
                 byteSum += bytesRead;
-                Thread.sleep(pause);
-
-                long downloadTime = System.nanoTime() - startAt;
                 if (byteSum >= speed) {
-                    pause = byteSum * 1_000_000L / (downloadTime * speed);
+                    long downloadTime = System.currentTimeMillis() - startAt;
+                    if (downloadTime < 1000) {
+                        Thread.sleep(1000 - downloadTime);
+                    }
                     byteSum = 0;
+                    startAt = System.currentTimeMillis();
                 }
             }
 
