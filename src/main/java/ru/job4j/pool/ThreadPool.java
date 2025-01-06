@@ -15,7 +15,7 @@ public class ThreadPool {
             Thread thread = new Thread(
                     () -> {
                         try {
-                            tasks.poll();
+                            tasks.poll().run();
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -39,6 +39,7 @@ public class ThreadPool {
     public static void main(String[] args) throws InterruptedException {
         ThreadPool threadPool = new ThreadPool();
         threadPool.work(() -> System.out.println("..."));
-        threadPool.tasks.poll().run();
+        threadPool.work(() -> System.out.println("---"));
+        threadPool.shutdown();
     }
 }
