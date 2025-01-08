@@ -21,7 +21,7 @@ public class ParallelObjectSearch<T> extends RecursiveTask<Integer> {
     @Override
     protected Integer compute() {
         if (to - from <= 10) {
-            return linearSearch(array, object, from, to);
+            return linearSearch();
         }
         int middle = (from + to) / 2;
         ParallelObjectSearch leftSearch = new ParallelObjectSearch(array, object, from, middle);
@@ -33,7 +33,7 @@ public class ParallelObjectSearch<T> extends RecursiveTask<Integer> {
         return (left != -1) ? left : right;
     }
 
-    private int linearSearch(T[] array, T object, int from, int to) {
+    private int linearSearch() {
         int result = -1;
         for (int i = from; i <= to; i++) {
             if (array[i].equals(object)) {
@@ -44,7 +44,7 @@ public class ParallelObjectSearch<T> extends RecursiveTask<Integer> {
         return result;
     }
 
-    public int search(T[] array, T object) {
+    public static <T> int search(T[] array, T object) {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
         return (int) forkJoinPool.invoke(new ParallelObjectSearch(array, object, 0, array.length - 1));
     }
